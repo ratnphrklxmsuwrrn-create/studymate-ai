@@ -1,6 +1,6 @@
 // POST: sync | status | link | test | unlink (ทุกคำสั่งใช้ uid ประจำเบราว์เซอร์ของแต่ละคน)
 // GET : Vercel Cron ทุกเช้า วนส่งแจ้งเตือนให้ทุกคนที่เชื่อม Telegram แล้ว
-const { redis, tg } = require("./_lib");
+const { redis, tg, pick } = require("./_lib");
 const bkk = () => new Date(Date.now() + 7 * 3600e3).toISOString().slice(0, 10);
 const daysTo = (a, b) => Math.round((new Date(b) - new Date(a)) / 864e5);
 const rand = () => [...require("crypto").randomBytes(12)].map((b) => b.toString(36).padStart(2, "0")).join("").slice(0, 20);
@@ -20,6 +20,21 @@ function buildLines(tasks, today) {
     }
   }
   return lines;
+}
+
+function buildReport(tasks, today) {
+  const now = [], soon = [];
+  for (const t of tasks) {
+    const left = (t.steps || []).filter((s) => !s.done);
+    if (!left.length) continue;
+    left.filter((s) => s.date <= today).forEach((s) => now.push(`• ${t.subject}: ${s.title} (${s.min} นาที)`));
+    const dl = daysTo(today, t.due);
+    if (dl >= 0 && dl <= 7) soon.push(`• ${t.subject} ${t.kind === "exam" ? "สอบ" : "ส่ง"} ${t.due.slice(8, 10)}/${t.due.slice(5, 7)} (อีก ${dl} วัน)`);
+  }
+  let m = "📋 สรุปงานตอนนี้\n\n";
+  m += now.length ? `🎯 ต้องทำวันนี้\n${now.join("\n")}\n\n` : "🎉 วันนี้ไม่มีงานค้างแล้ว\n\n";
+  if (soon.length) m += `⏰ ใกล้ถึงกำหนด (7 วัน)\n${soon.join("\n")}\n\n`;
+  return m + pick();
 }
 
 module.exports = async function handler(req, res) {
@@ -49,6 +64,13 @@ module.exports = async function handler(req, res) {
         await tg(chat, "✅ ทดสอบสำเร็จ! StudyMate AI จะแจ้งเตือนคุณทุกเช้า");
         return res.status(200).json({ ok: true });
       }
+      if (action === "report") {
+        const chat = await redis(["GET", "c:" + uid]);
+        if (!chat) throw new Error("ยังไม่ได้เชื่อม Telegram");
+        if (!Array.isArray(tasks)) throw new Error("bad tasks");
+        await tg(chat, buildReport(tasks, bkk()));
+        return res.status(200).json({ ok: true });
+      }
       if (action === "unlink") { await redis(["DEL", "c:" + uid]); return res.status(200).json({ ok: true }); }
       return res.status(400).json({ error: "unknown action" });
     }
@@ -62,7 +84,7 @@ module.exports = async function handler(req, res) {
         if (!chat) continue;
         const raw = await redis(["GET", "t:" + uid]);
         const lines = buildLines(raw ? JSON.parse(raw) : [], today);
-        if (lines.length) { await tg(chat, "สวัสดีตอนเช้า 📚 StudyMate AI\n\n" + lines.join("\n")); sent++; }
+        if (lines.length) { await tg(chat, "สวัสดีตอนเช้า 📚 StudyMate AI\n\n" + lines.join("\n") + "\n\n" + pick()); sent++; }
       } catch (e) {}
     }
     res.status(200).json({ users: uids.length, sent });

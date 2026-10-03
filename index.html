@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>StudyMate AI</title>
-<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Mali:wght@500;600&family=Prompt:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#FFFBEA;--card:#fff;--ink:#23283d;--mute:#6b6f85;--p:#4A69B3;--o:#BA3801;--y:#FFEC89;--line:#efe6b8}
 *{box-sizing:border-box}
@@ -46,6 +46,20 @@ details summary{cursor:pointer;list-style:none}
 .tbox{background:#fff;border-radius:24px;padding:24px;width:100%;max-width:380px;text-align:center}
 #tt{font-size:64px;font-weight:600;color:var(--o);margin:8px 0}#tb{background:var(--p)}.tbox .bar{background:var(--y)}
 .tbox button{margin:4px;padding:11px 16px;border-radius:12px;background:var(--p);color:#fff}.tbox .x{background:#eee;color:var(--ink)}
+body{background-image:radial-gradient(#f3e6a0 1.3px,transparent 1.4px);background-size:22px 22px}
+h1,h2,.qt{font-family:Mali,Prompt,sans-serif}
+.hero{position:relative;overflow:hidden;outline:2px dashed rgba(255,236,137,.7);outline-offset:-8px}.hero h1,.hero p{max-width:70%}
+.stk{position:absolute;pointer-events:none;line-height:0}
+.quote{position:relative;background:var(--y);border-radius:14px;padding:18px 16px 10px;margin:16px 0 4px;transform:rotate(-.8deg);text-align:center}
+.tape{position:absolute;top:-9px;left:50%;width:70px;height:18px;margin-left:-35px;background:rgba(186,56,1,.28);transform:rotate(-3deg);border-radius:3px}
+.qt{font-size:16px;font-weight:600;color:var(--o);line-height:1.5}
+.stat{border:2px dashed #e0cf7a}
+.receipt{background:#fff;border:2px solid var(--p);border-radius:16px;padding:14px;margin-bottom:10px}
+.rh{display:flex;justify-content:space-between;align-items:center;font-family:Mali,Prompt;font-weight:600;color:var(--p);border-bottom:2px dashed var(--line);padding-bottom:8px;margin-bottom:4px}
+.ri{padding:10px 0;border-bottom:1px dashed var(--line)}.ri:last-child{border-bottom:0}
+.toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:var(--o);color:#fff;padding:10px 16px;border-radius:99px;font-size:14px;z-index:20;max-width:90%;text-align:center;box-shadow:0 4px 14px rgba(0,0,0,.2)}
+#ed{position:fixed;inset:0;background:rgba(35,40,61,.6);display:flex;align-items:flex-start;justify-content:center;padding:16px;z-index:9;overflow:auto}#ed[hidden]{display:none}
+.ebox{background:#fff;border-radius:20px;padding:18px;width:100%;max-width:520px}.estep{background:#fffbea;border-radius:12px;padding:10px;margin-bottom:8px}.estep .row{margin-top:6px;flex-wrap:wrap}
 .pop{animation:pop .35s}@keyframes pop{50%{transform:scale(1.04)}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
@@ -55,6 +69,7 @@ details summary{cursor:pointer;list-style:none}
 <div id="tm" hidden><div class="tbox"><div id="tl" class="sub" style="font-size:14px"></div><div id="tt">00:00</div>
 <div class="bar"><i id="tb" style="width:0"></i></div><div id="tmsg" style="margin:12px 0;min-height:22px;color:var(--o);font-weight:500"></div>
 <button id="tp" data-t="pause">⏸ หยุดชั่วคราว</button><button id="td" data-t="done" hidden>เสร็จแล้ว ✅</button><button class="x" data-t="close">ปิด</button></div></div>
+<div id="ed" hidden><div class="ebox"><div id="edc"></div></div></div>
 <nav>
   <button data-v="dash" class="act">🏠 หน้าหลัก</button>
   <button data-v="add">➕ เพิ่มงาน</button>
@@ -111,6 +126,18 @@ const pct = () => { const a = tasks.flatMap(t=>t.steps); return a.length ? Math.
 let view = "dash", mode = "hw", busy = false, note = "";
 const stepBtns = (id,i,s) => `<div class="col"><button class="chk ${s.done?"on":""}" data-tog="${id}:${i}">${s.done?"เสร็จแล้ว ✅":"☐ ทำเสร็จ"}</button>${s.done?"":`<button class="go" data-start="${id}:${i}">▶ เริ่มทำ ${s.min} นาที</button>`}</div>`;
 
+const QUOTES = ["ค่อย ๆ ทำทีละนิด เดี๋ยวก็เสร็จเองนะ 🍅","วันนี้เก่งแล้ว พักสายตาสักนิดแล้วไปต่อ ✨","ทุกหน้าที่อ่าน คือก้าวเล็ก ๆ ที่พาเราไปไกล 📖","ไม่ต้องเพอร์เฟกต์ แค่เริ่มก็ชนะไปครึ่งทางแล้ว 🐟","ความพยายามไม่เคยหายไปไหน มันสะสมอยู่ในตัวเราเสมอ 💪","ดื่มน้ำ ยืดเส้นยืดสาย แล้วกลับมาลุยกันต่อ 💧","เหนื่อยได้ พักได้ แต่อย่าลืมว่าเราทำได้นะ 🌷","งานใหญ่แค่ไหน ก็แบ่งเป็นชิ้นเล็ก ๆ ได้ ✂️","ขอบคุณตัวเองที่ยังไม่ยอมแพ้ 🧡","อีกนิดเดียว! ขนมอร่อย ๆ รออยู่หลังเสร็จงาน 🥞"];
+let qi = Math.floor(Math.random()*QUOTES.length);
+const randQ = () => QUOTES[Math.floor(Math.random()*QUOTES.length)];
+const S = {
+  tomato: w => `<svg width="${w}" viewBox="0 0 48 48"><circle cx="24" cy="27" r="17" fill="#BA3801"/><path d="M24 11c-3 3-7 3-10 2 3 4 7 5 10 4 3 1 7 0 10-4-3 1-7 1-10-2z" fill="#6a9a3a"/><circle cx="18" cy="29" r="1.8" fill="#23283d"/><circle cx="30" cy="29" r="1.8" fill="#23283d"/><path d="M21 33q3 3 6 0" stroke="#23283d" stroke-width="1.6" fill="none" stroke-linecap="round"/><circle cx="14" cy="32" r="2.2" fill="#FFEC89" opacity=".6"/><circle cx="34" cy="32" r="2.2" fill="#FFEC89" opacity=".6"/></svg>`,
+  btn: w => `<svg width="${w}" viewBox="0 0 40 40"><circle cx="20" cy="20" r="17" fill="#BA3801"/><circle cx="20" cy="20" r="12" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width="1.5"/><path d="M14 14l12 12M26 14L14 26" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/></svg>`,
+  star: w => `<svg width="${w}" viewBox="0 0 50 50"><path d="M25 3l6 14 15 1-11 10 4 15-14-8-14 8 4-15L4 18l15-1z" fill="#FFEC89" stroke="#fff" stroke-width="1.5" stroke-dasharray="3 2.5"/></svg>`,
+  fish: w => `<svg width="${w}" viewBox="0 0 60 30"><ellipse cx="26" cy="15" rx="22" ry="9" fill="#9fb3dc"/><path d="M46 15l12-9v18z" fill="#fff" fill-opacity=".85"/><circle cx="12" cy="13" r="1.8" fill="#23283d"/><path d="M20 8q3 7 0 14" stroke="#4A69B3" fill="none" stroke-width="1.5"/></svg>`
+};
+function toast(m){ const d=document.createElement("div"); d.className="toast"; d.textContent=m; document.body.appendChild(d); setTimeout(()=>d.remove(),2800); }
+function renderKeep(){ const open=[...document.querySelectorAll("details")].map(d=>d.open); render(); document.querySelectorAll("details").forEach((d,k)=>d.open=open[k]); }
+
 function dash(){
   const h = new Date().getHours();
   const g = h<12 ? "สวัสดีตอนเช้า ☀️" : h<17 ? "สวัสดีตอนบ่าย 🌤️" : "สวัสดีตอนเย็น 🌙";
@@ -120,17 +147,22 @@ function dash(){
   tasks.forEach(t=>t.steps.forEach((s,i)=>{ if(!s.done && s.date<=today()) mission.push({t,s,i}); }));
   mission.sort((a,b)=>a.s.date.localeCompare(b.s.date));
   const top = mission.slice(0,5);
-  return `<div class="hero"><h1>${g}</h1><p>งานทั้งหมด ${tasks.length} งาน · ความคืบหน้า ${pct()}%</p><div class="bar"><i style="width:${pct()}%"></i></div></div>
-  <div class="stats">
+  return `<div class="hero">
+    <div class="stk" style="right:14px;top:8px;transform:rotate(14deg)">${S.star(44)}</div>
+    <div class="stk" style="right:62px;top:44px">${S.tomato(40)}</div>
+    <div class="stk" style="right:12px;bottom:12px;transform:rotate(-10deg)">${S.btn(30)}</div>
+    <h1>${g}</h1><p>งานทั้งหมด ${tasks.length} งาน · ความคืบหน้า ${pct()}%</p><div class="bar"><i style="width:${pct()}%"></i></div></div>
+  <div class="quote"><span class="tape"></span><div class="qt">${esc(QUOTES[qi])}</div><button class="ghost" data-q style="color:var(--p)">🔄 คำคมใหม่</button></div>
+  <div class="stats" style="margin-top:18px">
     <div class="stat"><b style="color:var(--o)">${c.urgent}</b><span>Urgent</span></div>
     <div class="stat"><b style="color:#a88a00">${c.soon}</b><span>Upcoming</span></div>
     <div class="stat"><b style="color:var(--p)">${c.later}</b><span>Later</span></div></div>
-  <h2>🎯 Today's Mission</h2>
-  ${top.length ? top.map(m=>`<div class="card row"><div class="grow"><div><b>${esc(m.t.subject)}</b></div><div>${esc(m.s.title)}</div><div class="sub">⏱ ${m.s.min} นาที${m.s.date<today()?" · เลยกำหนดแล้ว":""}</div></div>${stepBtns(m.t.id,m.i,m.s)}</div>`).join("")
-    : `<div class="card empty">ไม่มีภารกิจค้างสำหรับวันนี้ 🎉<br>กด "เพิ่มงาน" เพื่อให้ AI วางแผนงานใหม่</div>`}
+  <div class="receipt"><div class="rh"><span>🍅 Today's Mission</span>${tg?'<button class="go" data-report style="padding:5px 10px;font-size:12px">📨 ส่งไป Telegram</button>':`<span class="sub">No. ${String(mission.length).padStart(3,"0")}</span>`}</div>
+  ${top.length ? top.map(m=>`<div class="ri row"><div class="grow"><div><b>${esc(m.t.subject)}</b></div><div>${esc(m.s.title)}</div><div class="sub">⏱ ${m.s.min} นาที${m.s.date<today()?" · เลยกำหนดแล้ว":""}</div></div>${stepBtns(m.t.id,m.i,m.s)}</div>`).join("")
+    : `<div class="empty">${S.tomato(56)}<br>ไม่มีภารกิจค้างสำหรับวันนี้ 🎉<br>กด "เพิ่มงาน" เพื่อให้ AI วางแผนงานใหม่</div>`}</div>
   <h2>🔔 แจ้งเตือน Telegram</h2>
   <div class="card"><div class="sub">แจ้งเตือนทุกเช้า: การบ้านก่อนส่ง 2 วัน และหัวข้อที่ควรอ่านสอบวันนี้</div>
-  ${tg ? `<div style="margin:10px 0;color:var(--p);font-weight:500">✅ เชื่อม Telegram แล้ว</div><div class="row"><button class="chk" id="tgtest">ส่งข้อความทดสอบ</button><button class="ghost" id="tgoff">ยกเลิกการเชื่อม</button></div>`
+  ${tg ? `<div style="margin:10px 0;color:var(--p);font-weight:500">✅ เชื่อม Telegram แล้ว</div><div class="row" style="flex-wrap:wrap"><button class="chk" data-report>📨 ส่งสรุปงานตอนนี้</button><button class="go" id="tgtest">ส่งข้อความทดสอบ</button><button class="ghost" id="tgoff">ยกเลิกการเชื่อม</button></div>`
   : `<button class="main" id="tglink" style="background:var(--p)">🔗 เชื่อม Telegram ของฉัน</button><div class="sub" style="margin-top:8px">กดแล้วจะเปิด Telegram ให้กด Start จากนั้นกลับมาที่หน้านี้</div>`}</div>`;
 }
 
@@ -149,17 +181,17 @@ function add(){
 }
 
 function list(){
-  if(!tasks.length) return `<h2>📋 รายการงาน</h2><div class="card empty">ยังไม่มีงาน กดแท็บ "เพิ่มงาน" ได้เลย</div>`;
+  if(!tasks.length) return `<h2>📋 รายการงาน</h2><div class="card empty">${S.tomato(56)}<br>ยังไม่มีงาน กดแท็บ "เพิ่มงาน" ได้เลย</div>`;
   return `<h2>📋 รายการงาน</h2>` + tasks.map(t=>{
     const p = prio(t), d = t.steps.filter(s=>s.done).length, ex = t.kind==="exam";
     return `<details class="card"><summary class="row"><div class="grow"><b>${esc(t.subject)}</b> ${ex?'<span class="tag exam">📝 สอบ</span>':""}<div class="sub">${ex?"":esc(t.desc)+" · "}${ex?"สอบ ":"ส่ง "}${fmt(t.due)} · ${d}/${t.steps.length} ขั้น</div></div><span class="tag ${p}">${label[p]}</span></summary>
     ${t.steps.map((s,i)=>`<div class="step row ${s.done?"done":""}"><div class="grow"><div class="t">${esc(s.title)}</div><div class="sub">📅 ${fmt(s.date)} · ⏱ ${s.min} นาที</div></div>${stepBtns(t.id,i,s)}</div>`).join("")}
-    <div style="text-align:right;margin-top:8px"><button class="ghost" data-del="${t.id}">🗑 ลบงาน</button></div></details>`;
+    <div style="text-align:right;margin-top:8px"><button class="ghost" data-edit="${t.id}" style="color:var(--p)">✏️ แก้ไข</button> <button class="ghost" data-del="${t.id}">🗑 ลบงาน</button></div></details>`;
   }).join("");
 }
 
 function clock(){
-  return `<h2>⏱ จับเวลาอ่านหนังสือ</h2><div class="card"><div class="sub" style="margin-bottom:10px">เลือกเวลาที่จะโฟกัส แล้วอ่านให้จบก่อนหมดเวลา</div>
+  return `<h2>⏱ จับเวลาอ่านหนังสือ <span style="vertical-align:middle">${S.fish(46)}</span></h2><div class="card"><div class="sub" style="margin-bottom:10px">เลือกเวลาที่จะโฟกัส แล้วอ่านให้จบก่อนหมดเวลา</div>
   <div class="presets"><button data-free="25">25 นาที</button><button data-free="45">45 นาที</button><button data-free="60">60 นาที</button></div>
   <label>หรือกำหนดเอง (นาที)</label><div class="row"><input id="cust" type="number" min="1" max="240" value="30"><button class="chk" data-freec="1" style="padding:11px 16px">เริ่ม</button></div></div>
   <div class="msg">เคล็ดลับ: ในรายการงาน กด "▶ เริ่มทำ" ที่แต่ละขั้นตอนเพื่อจับเวลาตามที่ AI วางแผนไว้</div>`;
@@ -206,6 +238,36 @@ async function analyze(){
   const first = document.querySelector("details"); if(first) first.open = true;
 }
 
+// ---------- แก้ไขงาน ----------
+let E = null;
+function openEdit(id){ const t=tasks.find(x=>x.id==id); if(!t) return; E=JSON.parse(JSON.stringify(t)); drawEdit(); $("#ed").hidden=false; }
+function drawEdit(){
+  const ex = E.kind==="exam";
+  $("#edc").innerHTML = `<h2 style="margin-top:0">✏️ แก้ไขงาน</h2>
+  <label>ชื่อวิชา</label><input data-ef="subject" value="${esc(E.subject)}">
+  <label>${ex?"เนื้อหาที่ออกสอบ":"รายละเอียดงาน"}</label><textarea data-ef="desc">${esc(E.desc)}</textarea>
+  <label>${ex?"วันสอบ":"วันส่ง"}</label><input type="date" data-ef="due" value="${esc(E.due)}">
+  <label>ขั้นตอน</label>
+  ${E.steps.map((s,i)=>`<div class="estep"><input data-es="${i}:title" value="${esc(s.title)}"><div class="row"><input type="number" min="5" max="480" data-es="${i}:min" value="${s.min}" style="width:84px"><span class="sub">นาที</span><input type="date" data-es="${i}:date" value="${esc(s.date)}" style="width:auto;flex:1"><button class="ghost" data-edel="${i}">✖</button></div></div>`).join("")}
+  <button class="go" data-eadd>+ เพิ่มขั้นตอน</button>
+  <div class="row" style="margin-top:14px"><button class="main" data-esave style="margin:0">💾 บันทึก</button><button class="chk" data-eclose style="background:#eee;color:var(--ink);padding:14px 18px">ยกเลิก</button></div>`;
+}
+document.addEventListener("input", e=>{
+  if(!E) return; const f=e.target.dataset.ef, st=e.target.dataset.es;
+  if(f) E[f]=e.target.value;
+  else if(st){ const [i,k]=st.split(":"); E.steps[+i][k] = k==="min" ? Number(e.target.value)||0 : e.target.value; }
+});
+function saveEdit(){
+  if(!E.subject.trim()||!E.due) return alert("กรุณากรอกชื่อวิชาและวันที่ให้ครบ");
+  E.steps = E.steps.filter(s=>s.title.trim());
+  if(!E.steps.length) return alert("ต้องมีอย่างน้อย 1 ขั้นตอน");
+  E.steps.forEach(s=>{ s.min=Math.min(480,Math.max(5,s.min||30)); if(!s.date) s.date=today(); });
+  E.steps.sort((a,b)=>a.date.localeCompare(b.date));
+  const t=tasks.find(x=>x.id==E.id);
+  if(t) Object.assign(t,{subject:E.subject.trim(),desc:E.desc,due:E.due,steps:E.steps,sample:false});
+  save(); E=null; $("#ed").hidden=true; renderKeep(); toast("บันทึกแล้ว ✨");
+}
+
 // ---------- ตัวจับเวลา ----------
 let T = null;
 function beep(){ try{ const a=new (window.AudioContext||window.webkitAudioContext)(); [0,.35,.7].forEach(t=>{ const o=a.createOscillator(),g=a.createGain(); o.frequency.value=880; o.connect(g); g.connect(a.destination); g.gain.setValueAtTime(.25,a.currentTime+t); o.start(a.currentTime+t); o.stop(a.currentTime+t+.2); }); navigator.vibrate&&navigator.vibrate([200,100,200]); }catch(e){} }
@@ -226,19 +288,29 @@ function startTimer(label,min,ref){
 function closeT(){ if(T) clearInterval(T.iv); T=null; $("#tm").hidden=true; document.title="StudyMate AI"; }
 
 document.addEventListener("click", async e=>{
+  if(e.target.closest("[data-q]")){ qi=(qi+1+Math.floor(Math.random()*(QUOTES.length-1)))%QUOTES.length; return render(); }
+  const ed = e.target.closest("[data-edit]"); if(ed) return openEdit(ed.dataset.edit);
+  if(E){
+    if(e.target.closest("[data-eclose]")){ E=null; $("#ed").hidden=true; return; }
+    if(e.target.closest("[data-esave]")) return saveEdit();
+    if(e.target.closest("[data-eadd]")){ E.steps.push({title:"ขั้นตอนใหม่",min:30,date:today(),done:false}); return drawEdit(); }
+    const edel = e.target.closest("[data-edel]"); if(edel){ E.steps.splice(+edel.dataset.edel,1); return drawEdit(); }
+  }
+  const rp = e.target.closest("[data-report]");
+  if(rp){ rp.disabled=true; try{ await post({action:"report",tasks}); toast("ส่งสรุปงานไป Telegram แล้ว 📨"); }catch(x){ alert("ยังส่งไม่ได้: "+x.message); } rp.disabled=false; return; }
   const nav = e.target.closest("nav button"); if(nav){ view=nav.dataset.v; note=""; return render(); }
   const mb = e.target.closest("[data-m]"); if(mb){ mode=mb.dataset.m; note=""; return render(); }
   const tb = e.target.closest("[data-t]");
   if(tb){ const a=tb.dataset.t;
     if(a==="close") return closeT();
     if(a==="pause"){ if(T.left===0){ T.left=T.total; } if(T.run){ T.run=false; } else { T.run=true; T.end=Date.now()+T.left*1000; clearInterval(T.iv); T.iv=setInterval(tick,250); } return drawT(); }
-    if(a==="done"){ const t=tasks.find(x=>x.id==T.ref.id); if(t){ t.steps[T.ref.i].done=true; save(); } closeT(); return render(); } }
+    if(a==="done"){ const t=tasks.find(x=>x.id==T.ref.id); if(t){ t.steps[T.ref.i].done=true; save(); toast("🍅 เก่งมาก! "+randQ()); } closeT(); return render(); } }
   const st = e.target.closest("[data-start]");
   if(st){ const [id,i]=st.dataset.start.split(":"); const t=tasks.find(x=>x.id==id); if(t){ const s=t.steps[+i]; startTimer(`${t.subject}: ${s.title}`, s.min, {id:t.id,i:+i}); } return; }
   const fr = e.target.closest("[data-free]"); if(fr) return startTimer("โฟกัสอ่านหนังสือ", +fr.dataset.free, null);
   if(e.target.closest("[data-freec]")){ const v=Math.min(240,Math.max(1,Number($("#cust").value)||25)); return startTimer("โฟกัสอ่านหนังสือ", v, null); }
   const tog = e.target.closest("[data-tog]");
-  if(tog){ const [id,i]=tog.dataset.tog.split(":"); const t=tasks.find(x=>x.id==id); if(t){ t.steps[+i].done=!t.steps[+i].done; save();
+  if(tog){ const [id,i]=tog.dataset.tog.split(":"); const t=tasks.find(x=>x.id==id); if(t){ t.steps[+i].done=!t.steps[+i].done; save(); if(t.steps[+i].done) toast("🍅 เก่งมาก! "+randQ());
     const open=[...document.querySelectorAll("details")].map(d=>d.open); render(); document.querySelectorAll("details").forEach((d,k)=>d.open=open[k]);} return; }
   const del = e.target.closest("[data-del]");
   if(del){ if(confirm("ลบงานนี้ใช่ไหม?")){ tasks=tasks.filter(x=>x.id!=del.dataset.del); save(); render(); } return; }

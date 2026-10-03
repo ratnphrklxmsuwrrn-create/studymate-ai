@@ -14,4 +14,6 @@ const tg = async (chat, text) => {
   const r = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ chat_id: chat, text }) });
   if (!r.ok) throw new Error("Telegram ส่งไม่สำเร็จ");
 };
-module.exports = { redis, tg };
+const QUOTES = ["ค่อย ๆ ทำทีละนิด เดี๋ยวก็เสร็จเองนะ 🍅","วันนี้เก่งแล้ว พักสายตาสักนิดแล้วไปต่อ ✨","ทุกหน้าที่อ่าน คือก้าวเล็ก ๆ ที่พาเราไปไกล 📖","ไม่ต้องเพอร์เฟกต์ แค่เริ่มก็ชนะไปครึ่งทางแล้ว 🐟","ความพยายามไม่เคยหายไปไหน มันสะสมอยู่ในตัวเราเสมอ 💪","ดื่มน้ำ ยืดเส้นยืดสาย แล้วกลับมาลุยกันต่อ 💧","เหนื่อยได้ พักได้ แต่อย่าลืมว่าเราทำได้นะ 🌷","งานใหญ่แค่ไหน ก็แบ่งเป็นชิ้นเล็ก ๆ ได้ ✂️","ขอบคุณตัวเองที่ยังไม่ยอมแพ้ 🧡","อีกนิดเดียว! ขนมอร่อย ๆ รออยู่หลังเสร็จงาน 🥞"];
+const pick = () => "💛 " + QUOTES[Math.floor(Math.random() * QUOTES.length)];
+module.exports = { redis, tg, pick, QUOTES };
