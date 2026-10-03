@@ -6,14 +6,14 @@
 <title>StudyMate AI</title>
 <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#f4f3fb;--card:#fff;--ink:#1f1d3a;--mute:#6d6a8c;--p:#6c4cf1;--b:#3b9cf5;--red:#e5484d;--yel:#e8a317;--grn:#2fa67a;--line:#e4e1f5}
+:root{--bg:#FFFBEA;--card:#fff;--ink:#23283d;--mute:#6b6f85;--p:#4A69B3;--o:#BA3801;--y:#FFEC89;--line:#efe6b8}
 *{box-sizing:border-box}
 body{margin:0;font-family:Prompt,system-ui,sans-serif;background:var(--bg);color:var(--ink);padding-bottom:84px}
 .wrap{max-width:720px;margin:0 auto;padding:20px 16px}
-.hero{background:linear-gradient(135deg,var(--p),var(--b));color:#fff;border-radius:22px;padding:22px}
+.hero{background:var(--p);color:#fff;border-radius:22px;padding:22px}
 .hero h1{margin:0 0 4px;font-size:22px;font-weight:600}.hero p{margin:0;opacity:.9;font-size:14px}
-.bar{height:10px;background:rgba(255,255,255,.3);border-radius:9px;margin-top:16px;overflow:hidden}
-.bar i{display:block;height:100%;background:#fff;border-radius:9px;transition:width .4s}
+.bar{height:10px;background:rgba(255,255,255,.25);border-radius:9px;margin-top:16px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--y);border-radius:9px;transition:width .4s}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0}
 .stat{background:var(--card);border-radius:16px;padding:14px 10px;text-align:center;border:1px solid var(--line)}
 .stat b{display:block;font-size:26px}.stat span{font-size:12px;color:var(--mute)}
@@ -23,33 +23,43 @@ h2{font-size:17px;margin:22px 0 10px}
 .sub{font-size:12px;color:var(--mute)}
 .done .t{text-decoration:line-through;color:var(--mute)}
 .tag{font-size:11px;padding:2px 9px;border-radius:99px;color:#fff;white-space:nowrap}
-.urgent{background:var(--red)}.soon{background:var(--yel)}.later{background:var(--grn)}.fin{background:var(--mute)}
+.urgent{background:var(--o)}.soon{background:var(--y);color:var(--ink)}.later{background:var(--p)}.fin{background:var(--mute)}.exam{background:var(--y);color:var(--o);font-weight:500}
 button{font:inherit;cursor:pointer;border:0}
 .chk{background:var(--p);color:#fff;border-radius:10px;padding:7px 12px;font-size:13px;white-space:nowrap}
-.chk.on{background:var(--grn)}
-.ghost{background:none;color:var(--red);font-size:13px}
-.main{width:100%;background:linear-gradient(135deg,var(--p),var(--b));color:#fff;border-radius:14px;padding:14px;font-size:16px;font-weight:500;margin-top:6px}
+.chk.on{background:var(--mute)}.go{background:var(--y);color:var(--o);border-radius:10px;padding:7px 12px;font-size:13px;font-weight:500;white-space:nowrap}.col{display:flex;flex-direction:column;gap:6px}
+.ghost{background:none;color:var(--o);font-size:13px}
+.main{width:100%;background:var(--o);color:#fff;border-radius:14px;padding:14px;font-size:16px;font-weight:500;margin-top:6px}
 .main:disabled{opacity:.6}
 label{display:block;font-size:13px;color:var(--mute);margin:12px 0 4px}
 input,textarea,select{width:100%;font:inherit;padding:11px;border:1px solid var(--line);border-radius:12px;background:#fff;color:var(--ink)}
 textarea{min-height:90px}
 nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);display:flex;justify-content:center;gap:6px;padding:8px}
-nav button{flex:1;max-width:220px;background:none;padding:10px;border-radius:12px;color:var(--mute);font-size:13px}
-nav button.act{background:#ece8ff;color:var(--p);font-weight:600}
+nav button{flex:1;max-width:180px;background:none;padding:10px;border-radius:12px;color:var(--mute);font-size:13px}
+nav button.act{background:var(--y);color:var(--o);font-weight:600}
 .empty{text-align:center;color:var(--mute);padding:24px}
 .msg{font-size:13px;margin-top:10px;color:var(--mute)}
 details summary{cursor:pointer;list-style:none}
 .step{padding:9px 0;border-top:1px solid var(--line)}
+.seg{display:flex;gap:6px;background:#f6efc4;padding:4px;border-radius:14px}.seg button{flex:1;padding:9px;border-radius:11px;background:none;color:var(--mute)}.seg button.act{background:#fff;color:var(--o);font-weight:600}
+.presets{display:flex;gap:8px;flex-wrap:wrap}.presets button{flex:1;min-width:80px;background:var(--p);color:#fff;border-radius:12px;padding:12px}
+#tm{position:fixed;inset:0;background:rgba(35,40,61,.6);display:flex;align-items:center;justify-content:center;padding:16px;z-index:9}#tm[hidden]{display:none}
+.tbox{background:#fff;border-radius:24px;padding:24px;width:100%;max-width:380px;text-align:center}
+#tt{font-size:64px;font-weight:600;color:var(--o);margin:8px 0}#tb{background:var(--p)}.tbox .bar{background:var(--y)}
+.tbox button{margin:4px;padding:11px 16px;border-radius:12px;background:var(--p);color:#fff}.tbox .x{background:#eee;color:var(--ink)}
 .pop{animation:pop .35s}@keyframes pop{50%{transform:scale(1.04)}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
 <div class="wrap" id="app"></div>
+<div id="tm" hidden><div class="tbox"><div id="tl" class="sub" style="font-size:14px"></div><div id="tt">00:00</div>
+<div class="bar"><i id="tb" style="width:0"></i></div><div id="tmsg" style="margin:12px 0;min-height:22px;color:var(--o);font-weight:500"></div>
+<button id="tp" data-t="pause">⏸ หยุดชั่วคราว</button><button id="td" data-t="done" hidden>เสร็จแล้ว ✅</button><button class="x" data-t="close">ปิด</button></div></div>
 <nav>
   <button data-v="dash" class="act">🏠 หน้าหลัก</button>
   <button data-v="add">➕ เพิ่มงาน</button>
   <button data-v="list">📋 รายการงาน</button>
+  <button data-v="clock">⏱ จับเวลา</button>
 </nav>
 <script>
 const $ = s => document.querySelector(s);
@@ -72,11 +82,20 @@ const sample = () => [
     {title:"ทำ Presentation",min:60,date:addDays(8),done:false}]},
   {id:3,subject:"คณิตศาสตร์",desc:"แบบฝึกหัดบทที่ 5",due:addDays(14),diff:"ง่าย",steps:[
     {title:"ทำข้อ 1-10",min:40,date:addDays(10),done:false},
-    {title:"ทำข้อ 11-20 และส่งงาน",min:40,date:addDays(13),done:false}]}
-];
+    {title:"ทำข้อ 11-20 และส่งงาน",min:40,date:addDays(13),done:false}]},
+  {id:4,kind:"exam",subject:"ฟิสิกส์ (สอบ)",desc:"แรงและการเคลื่อนที่\nงานและพลังงาน",due:addDays(6),diff:"",steps:[
+    {title:"อ่าน: แรงและการเคลื่อนที่",min:60,date:today(),done:false},
+    {title:"อ่าน: งานและพลังงาน",min:60,date:addDays(2),done:false},
+    {title:"ทบทวนรวมและทำโจทย์",min:60,date:addDays(5),done:false}]}
+].map(t=>({...t,sample:true}));
+let uid; try{ uid=localStorage.getItem("sm_uid"); if(!uid){ uid=crypto.randomUUID(); localStorage.setItem("sm_uid",uid);} }catch(e){ uid=crypto.randomUUID(); }
 let tasks; try { tasks = JSON.parse(localStorage.getItem("sm_tasks")); } catch(e){}
 if (!Array.isArray(tasks)) tasks = sample();
-const save = () => { try { localStorage.setItem("sm_tasks", JSON.stringify(tasks)); } catch(e){} };
+let syncT, tg = false;
+const post = b => fetch("/api/notify",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({uid,...b})}).then(async r=>{ const j=await r.json(); if(!r.ok) throw new Error(j.error); return j; });
+const refreshTg = () => post({action:"status"}).then(j=>{ tg=j.linked; if(view==="dash") render(); }).catch(()=>{});
+const save = () => { try { localStorage.setItem("sm_tasks", JSON.stringify(tasks)); } catch(e){}
+  clearTimeout(syncT); syncT = setTimeout(()=>post({action:"sync",tasks}).catch(()=>{}),800); };
 
 function prio(t){
   const left = t.steps.filter(s=>!s.done);
@@ -86,10 +105,11 @@ function prio(t){
   if(dl<=7) return "soon";
   return "later";
 }
-const label = {urgent:"🔴 ต้องทำวันนี้",soon:"🟡 ควรทำเร็ว ๆ นี้",later:"🟢 ยังไม่เร่ง",fin:"✅ เสร็จแล้ว"};
+const label = {urgent:"ต้องทำวันนี้",soon:"ควรทำเร็ว ๆ นี้",later:"ยังไม่เร่ง",fin:"เสร็จแล้ว ✅"};
 const pct = () => { const a = tasks.flatMap(t=>t.steps); return a.length ? Math.round(a.filter(s=>s.done).length/a.length*100) : 0; };
 
-let view = "dash", busy = false, note = "";
+let view = "dash", mode = "hw", busy = false, note = "";
+const stepBtns = (id,i,s) => `<div class="col"><button class="chk ${s.done?"on":""}" data-tog="${id}:${i}">${s.done?"เสร็จแล้ว ✅":"☐ ทำเสร็จ"}</button>${s.done?"":`<button class="go" data-start="${id}:${i}">▶ เริ่มทำ ${s.min} นาที</button>`}</div>`;
 
 function dash(){
   const h = new Date().getHours();
@@ -102,20 +122,28 @@ function dash(){
   const top = mission.slice(0,5);
   return `<div class="hero"><h1>${g}</h1><p>งานทั้งหมด ${tasks.length} งาน · ความคืบหน้า ${pct()}%</p><div class="bar"><i style="width:${pct()}%"></i></div></div>
   <div class="stats">
-    <div class="stat"><b style="color:var(--red)">${c.urgent}</b><span>🔴 Urgent</span></div>
-    <div class="stat"><b style="color:var(--yel)">${c.soon}</b><span>🟡 Upcoming</span></div>
-    <div class="stat"><b style="color:var(--grn)">${c.later}</b><span>🟢 Later</span></div></div>
+    <div class="stat"><b style="color:var(--o)">${c.urgent}</b><span>Urgent</span></div>
+    <div class="stat"><b style="color:#a88a00">${c.soon}</b><span>Upcoming</span></div>
+    <div class="stat"><b style="color:var(--p)">${c.later}</b><span>Later</span></div></div>
   <h2>🎯 Today's Mission</h2>
-  ${top.length ? top.map(m=>`<div class="card row"><div class="grow"><div><b>${esc(m.t.subject)}</b></div><div>${esc(m.s.title)}</div><div class="sub">⏱ ${m.s.min} นาที${m.s.date<today()?" · เลยกำหนดแล้ว":""}</div></div><button class="chk" data-tog="${m.t.id}:${m.i}">เสร็จแล้ว ✅</button></div>`).join("")
-    : `<div class="card empty">ไม่มีภารกิจค้างสำหรับวันนี้ 🎉<br>กด "เพิ่มงาน" เพื่อให้ AI วางแผนงานใหม่</div>`}`;
+  ${top.length ? top.map(m=>`<div class="card row"><div class="grow"><div><b>${esc(m.t.subject)}</b></div><div>${esc(m.s.title)}</div><div class="sub">⏱ ${m.s.min} นาที${m.s.date<today()?" · เลยกำหนดแล้ว":""}</div></div>${stepBtns(m.t.id,m.i,m.s)}</div>`).join("")
+    : `<div class="card empty">ไม่มีภารกิจค้างสำหรับวันนี้ 🎉<br>กด "เพิ่มงาน" เพื่อให้ AI วางแผนงานใหม่</div>`}
+  <h2>🔔 แจ้งเตือน Telegram</h2>
+  <div class="card"><div class="sub">แจ้งเตือนทุกเช้า: การบ้านก่อนส่ง 2 วัน และหัวข้อที่ควรอ่านสอบวันนี้</div>
+  ${tg ? `<div style="margin:10px 0;color:var(--p);font-weight:500">✅ เชื่อม Telegram แล้ว</div><div class="row"><button class="chk" id="tgtest">ส่งข้อความทดสอบ</button><button class="ghost" id="tgoff">ยกเลิกการเชื่อม</button></div>`
+  : `<button class="main" id="tglink" style="background:var(--p)">🔗 เชื่อม Telegram ของฉัน</button><div class="sub" style="margin-top:8px">กดแล้วจะเปิด Telegram ให้กด Start จากนั้นกลับมาที่หน้านี้</div>`}</div>`;
 }
 
 function add(){
-  return `<h2>➕ เพิ่มงานใหม่</h2><div class="card">
+  const hw = mode==="hw";
+  return `<h2>➕ เพิ่มงาน</h2><div class="seg"><button data-m="hw" class="${hw?"act":""}">📚 การบ้าน</button><button data-m="exam" class="${hw?"":"act"}">📝 เตรียมสอบ</button></div>
+  <div class="card" style="margin-top:12px">
   <label>ชื่อวิชา</label><input id="f_sub" placeholder="เช่น ชีววิทยา">
-  <label>รายละเอียดงาน / โจทย์</label><textarea id="f_desc" placeholder="เช่น ทำรายงานเรื่องระบบย่อยอาหาร อย่างน้อย 5 หน้า"></textarea>
-  <label>วันส่ง</label><input id="f_due" type="date" min="${today()}" value="${addDays(7)}">
-  <label>ความยาก</label><select id="f_diff"><option>ง่าย</option><option selected>ปานกลาง</option><option>ยาก</option></select>
+  <label>${hw?"รายละเอียดงาน / โจทย์":"เนื้อหาที่ออกสอบ (พิมพ์ทีละหัวข้อ บรรทัดละหนึ่งหัวข้อ)"}</label>
+  <textarea id="f_desc" placeholder="${hw?"เช่น ทำรายงานเรื่องระบบย่อยอาหาร อย่างน้อย 5 หน้า":"บทที่ 1 เซลล์\nบทที่ 2 พันธุกรรม\nบทที่ 3 ระบบย่อยอาหาร"}"></textarea>
+  <label>${hw?"วันส่ง":"วันสอบ"}</label><input id="f_due" type="date" min="${today()}" value="${addDays(7)}">
+  ${hw?`<label>ความยาก</label><select id="f_diff"><option>ง่าย</option><option selected>ปานกลาง</option><option>ยาก</option></select>`
+      :`<label>เวลาอ่านได้ต่อวัน</label><select id="f_per"><option value="30">30 นาที</option><option value="60" selected>1 ชั่วโมง</option><option value="90">1 ชั่วโมงครึ่ง</option><option value="120">2 ชั่วโมง</option></select>`}
   <button class="main" id="go" ${busy?"disabled":""}>${busy?"AI กำลังวิเคราะห์...":"✨ ให้ AI วิเคราะห์"}</button>
   <div class="msg">${esc(note)}</div></div>`;
 }
@@ -123,57 +151,104 @@ function add(){
 function list(){
   if(!tasks.length) return `<h2>📋 รายการงาน</h2><div class="card empty">ยังไม่มีงาน กดแท็บ "เพิ่มงาน" ได้เลย</div>`;
   return `<h2>📋 รายการงาน</h2>` + tasks.map(t=>{
-    const p = prio(t), d = t.steps.filter(s=>s.done).length;
-    return `<details class="card"><summary class="row"><div class="grow"><b>${esc(t.subject)}</b><div class="sub">${esc(t.desc)} · ส่ง ${fmt(t.due)} · ${d}/${t.steps.length} ขั้น</div></div><span class="tag ${p}">${label[p]}</span></summary>
-    ${t.steps.map((s,i)=>`<div class="step row ${s.done?"done":""}"><div class="grow"><div class="t">${esc(s.title)}</div><div class="sub">📅 ${fmt(s.date)} · ⏱ ${s.min} นาที</div></div><button class="chk ${s.done?"on":""}" data-tog="${t.id}:${i}">${s.done?"เสร็จแล้ว ✅":"☐ ทำเสร็จ"}</button></div>`).join("")}
+    const p = prio(t), d = t.steps.filter(s=>s.done).length, ex = t.kind==="exam";
+    return `<details class="card"><summary class="row"><div class="grow"><b>${esc(t.subject)}</b> ${ex?'<span class="tag exam">📝 สอบ</span>':""}<div class="sub">${ex?"":esc(t.desc)+" · "}${ex?"สอบ ":"ส่ง "}${fmt(t.due)} · ${d}/${t.steps.length} ขั้น</div></div><span class="tag ${p}">${label[p]}</span></summary>
+    ${t.steps.map((s,i)=>`<div class="step row ${s.done?"done":""}"><div class="grow"><div class="t">${esc(s.title)}</div><div class="sub">📅 ${fmt(s.date)} · ⏱ ${s.min} นาที</div></div>${stepBtns(t.id,i,s)}</div>`).join("")}
     <div style="text-align:right;margin-top:8px"><button class="ghost" data-del="${t.id}">🗑 ลบงาน</button></div></details>`;
   }).join("");
 }
 
+function clock(){
+  return `<h2>⏱ จับเวลาอ่านหนังสือ</h2><div class="card"><div class="sub" style="margin-bottom:10px">เลือกเวลาที่จะโฟกัส แล้วอ่านให้จบก่อนหมดเวลา</div>
+  <div class="presets"><button data-free="25">25 นาที</button><button data-free="45">45 นาที</button><button data-free="60">60 นาที</button></div>
+  <label>หรือกำหนดเอง (นาที)</label><div class="row"><input id="cust" type="number" min="1" max="240" value="30"><button class="chk" data-freec="1" style="padding:11px 16px">เริ่ม</button></div></div>
+  <div class="msg">เคล็ดลับ: ในรายการงาน กด "▶ เริ่มทำ" ที่แต่ละขั้นตอนเพื่อจับเวลาตามที่ AI วางแผนไว้</div>`;
+}
+
+const FIELDS = ["f_sub","f_desc","f_due","f_diff","f_per"];
 function render(){
-  const keep = ["f_sub","f_desc","f_due","f_diff"].map(id=>$("#"+id)?.value);
-  $("#app").innerHTML = view==="dash" ? dash() : view==="add" ? add() : list();
-  if(view==="add") ["f_sub","f_desc","f_due","f_diff"].forEach((id,i)=>{ if(keep[i]!==undefined) $("#"+id).value = keep[i]; });
+  const keep = FIELDS.map(id=>$("#"+id)?.value);
+  $("#app").innerHTML = view==="dash" ? dash() : view==="add" ? add() : view==="list" ? list() : clock();
+  if(view==="add") FIELDS.forEach((id,i)=>{ const el=$("#"+id); if(el && keep[i]!==undefined) el.value = keep[i]; });
   document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("act", b.dataset.v===view));
 }
 
-// ตัววางแผนสำรอง (ใช้เมื่อไม่มี API Key หรือ API ใช้ไม่ได้)
 function localPlan(diff, due){
   const mult = {"ง่าย":.7,"ปานกลาง":1,"ยาก":1.5}[diff] || 1;
   const names = [["เลือกหัวข้อ / ทำความเข้าใจโจทย์",30],["ค้นคว้าข้อมูล (Research)",60],["วางโครงเรื่อง",30],["ลงมือทำ / เขียนเนื้อหา",90],["ตรวจทานและแก้ไข",40],["ส่งงาน",15]];
   const span = Math.max(daysTo(due),0);
   return names.map(([title,m],i)=>({title,min:Math.round(m*mult/5)*5,date:addDays(Math.round(span*i/(names.length-1))),done:false}));
 }
+function examPlan(desc, due, per){
+  const tp = desc.split("\n").map(x=>x.trim()).filter(Boolean);
+  const d = Math.max(daysTo(due),1), n = tp.length || 1;
+  const m = Math.min(180, Math.max(15, Math.round(per*d/n/5)*5));
+  const out = tp.map((t,i)=>({title:"อ่าน: "+t,min:m,date:addDays(Math.min(Math.floor(i*d/n), Math.max(daysTo(due),0))),done:false}));
+  out.push({title:"ทบทวนรวมและทำโจทย์",min:per,date:addDays(Math.max(daysTo(due)-1,0)),done:false});
+  return out;
+}
 
 async function analyze(){
-  const subject=$("#f_sub").value.trim(), desc=$("#f_desc").value.trim(), due=$("#f_due").value, diff=$("#f_diff").value;
-  if(!subject||!desc||!due){ note="กรุณากรอกวิชา โจทย์ และวันส่งให้ครบ"; return render(); }
+  const subject=$("#f_sub").value.trim(), desc=$("#f_desc").value.trim(), due=$("#f_due").value;
+  const diff=$("#f_diff")?.value, per=Number($("#f_per")?.value||60);
+  if(!subject||!desc||!due){ note="กรุณากรอกข้อมูลให้ครบทุกช่อง"; return render(); }
   busy=true; note=""; render();
-  let steps, via = "AI";
+  let steps;
   try{
-    const r = await fetch("/api/analyze",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({subject,desc,due,diff,today:today()})});
+    const r = await fetch("/api/analyze",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({mode,subject,desc,due,diff,perDay:per,today:today()})});
     const j = await r.json();
     if(!r.ok) throw new Error(j.error);
     steps = j.steps.map(s=>({title:String(s.title),min:Number(s.minutes)||30,date:(s.date>due?due:s.date<today()?today():s.date),done:false}));
-  }catch(e){ steps = localPlan(diff,due); via = "ตัววางแผนสำรอง (ยังไม่ได้เชื่อม AI)"; }
+  }catch(e){ steps = mode==="exam" ? examPlan(desc,due,per) : localPlan(diff,due); }
   steps.sort((a,b)=>a.date.localeCompare(b.date));
-  tasks.unshift({id:Date.now(),subject,desc,due,diff,steps});
-  save(); busy=false; view="list";
-  render();
+  tasks.unshift({id:Date.now(),kind:mode,subject,desc,due,diff:diff||"",steps});
+  save(); busy=false; view="list"; render();
   const first = document.querySelector("details"); if(first) first.open = true;
-  console.log("วิเคราะห์ด้วย:", via);
 }
 
-document.addEventListener("click", e=>{
+// ---------- ตัวจับเวลา ----------
+let T = null;
+function beep(){ try{ const a=new (window.AudioContext||window.webkitAudioContext)(); [0,.35,.7].forEach(t=>{ const o=a.createOscillator(),g=a.createGain(); o.frequency.value=880; o.connect(g); g.connect(a.destination); g.gain.setValueAtTime(.25,a.currentTime+t); o.start(a.currentTime+t); o.stop(a.currentTime+t+.2); }); navigator.vibrate&&navigator.vibrate([200,100,200]); }catch(e){} }
+function drawT(){
+  const m=String(Math.floor(T.left/60)).padStart(2,"0"), sec=String(T.left%60).padStart(2,"0");
+  $("#tt").textContent=m+":"+sec; $("#tl").textContent=T.label; document.title=T.run?`${m}:${sec} · StudyMate AI`:"StudyMate AI";
+  $("#tb").style.width=(100-T.left/T.total*100)+"%";
+  $("#tp").textContent = T.left===0 ? "🔁 เริ่มใหม่" : T.run ? "⏸ หยุดชั่วคราว" : "▶ ทำต่อ";
+  $("#tmsg").textContent = T.left===0 ? "หมดเวลาแล้ว! 🎉" : "";
+  $("#td").hidden = !T.ref;
+}
+function tick(){ if(!T||!T.run) return; T.left=Math.max(0,Math.round((T.end-Date.now())/1000)); if(T.left===0){ T.run=false; clearInterval(T.iv); beep(); } drawT(); }
+function startTimer(label,min,ref){
+  if(T) clearInterval(T.iv);
+  T={label,total:min*60,left:min*60,run:true,ref}; T.end=Date.now()+T.left*1000; T.iv=setInterval(tick,250);
+  $("#tm").hidden=false; drawT();
+}
+function closeT(){ if(T) clearInterval(T.iv); T=null; $("#tm").hidden=true; document.title="StudyMate AI"; }
+
+document.addEventListener("click", async e=>{
   const nav = e.target.closest("nav button"); if(nav){ view=nav.dataset.v; note=""; return render(); }
+  const mb = e.target.closest("[data-m]"); if(mb){ mode=mb.dataset.m; note=""; return render(); }
+  const tb = e.target.closest("[data-t]");
+  if(tb){ const a=tb.dataset.t;
+    if(a==="close") return closeT();
+    if(a==="pause"){ if(T.left===0){ T.left=T.total; } if(T.run){ T.run=false; } else { T.run=true; T.end=Date.now()+T.left*1000; clearInterval(T.iv); T.iv=setInterval(tick,250); } return drawT(); }
+    if(a==="done"){ const t=tasks.find(x=>x.id==T.ref.id); if(t){ t.steps[T.ref.i].done=true; save(); } closeT(); return render(); } }
+  const st = e.target.closest("[data-start]");
+  if(st){ const [id,i]=st.dataset.start.split(":"); const t=tasks.find(x=>x.id==id); if(t){ const s=t.steps[+i]; startTimer(`${t.subject}: ${s.title}`, s.min, {id:t.id,i:+i}); } return; }
+  const fr = e.target.closest("[data-free]"); if(fr) return startTimer("โฟกัสอ่านหนังสือ", +fr.dataset.free, null);
+  if(e.target.closest("[data-freec]")){ const v=Math.min(240,Math.max(1,Number($("#cust").value)||25)); return startTimer("โฟกัสอ่านหนังสือ", v, null); }
   const tog = e.target.closest("[data-tog]");
   if(tog){ const [id,i]=tog.dataset.tog.split(":"); const t=tasks.find(x=>x.id==id); if(t){ t.steps[+i].done=!t.steps[+i].done; save();
     const open=[...document.querySelectorAll("details")].map(d=>d.open); render(); document.querySelectorAll("details").forEach((d,k)=>d.open=open[k]);} return; }
   const del = e.target.closest("[data-del]");
   if(del){ if(confirm("ลบงานนี้ใช่ไหม?")){ tasks=tasks.filter(x=>x.id!=del.dataset.del); save(); render(); } return; }
+  if(e.target.id==="tglink"){ try{ const j=await post({action:"link"}); window.location.href=j.url; }catch(x){ alert("ยังเชื่อมไม่ได้: "+x.message); } return; }
+  if(e.target.id==="tgtest"){ try{ await post({action:"test"}); alert("ส่งแล้ว! เช็ค Telegram ได้เลย"); }catch(x){ alert("ยังส่งไม่ได้: "+x.message); } return; }
+  if(e.target.id==="tgoff"){ await post({action:"unlink"}).catch(()=>{}); tg=false; return render(); }
   if(e.target.id==="go") analyze();
 });
-render();
+render(); save(); refreshTg();
+document.addEventListener("visibilitychange",()=>{ if(!document.hidden) refreshTg(); });
 </script>
 </body>
 </html>
