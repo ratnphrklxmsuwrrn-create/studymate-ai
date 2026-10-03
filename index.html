@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>StudyMate AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f4f3fb;--card:#fff;--ink:#1f1d3a;--mute:#6d6a8c;--p:#6c4cf1;--b:#3b9cf5;--red:#e5484d;--yel:#e8a317;--grn:#2fa67a;--line:#e4e1f5}
+*{box-sizing:border-box}
+body{margin:0;font-family:Prompt,system-ui,sans-serif;background:var(--bg);color:var(--ink);padding-bottom:84px}
+.wrap{max-width:720px;margin:0 auto;padding:20px 16px}
+.hero{background:linear-gradient(135deg,var(--p),var(--b));color:#fff;border-radius:22px;padding:22px}
+.hero h1{margin:0 0 4px;font-size:22px;font-weight:600}.hero p{margin:0;opacity:.9;font-size:14px}
+.bar{height:10px;background:rgba(255,255,255,.3);border-radius:9px;margin-top:16px;overflow:hidden}
+.bar i{display:block;height:100%;background:#fff;border-radius:9px;transition:width .4s}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0}
+.stat{background:var(--card);border-radius:16px;padding:14px 10px;text-align:center;border:1px solid var(--line)}
+.stat b{display:block;font-size:26px}.stat span{font-size:12px;color:var(--mute)}
+h2{font-size:17px;margin:22px 0 10px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:10px}
+.row{display:flex;align-items:center;gap:10px}.grow{flex:1;min-width:0}
+.sub{font-size:12px;color:var(--mute)}
+.done .t{text-decoration:line-through;color:var(--mute)}
+.tag{font-size:11px;padding:2px 9px;border-radius:99px;color:#fff;white-space:nowrap}
+.urgent{background:var(--red)}.soon{background:var(--yel)}.later{background:var(--grn)}.fin{background:var(--mute)}
+button{font:inherit;cursor:pointer;border:0}
+.chk{background:var(--p);color:#fff;border-radius:10px;padding:7px 12px;font-size:13px;white-space:nowrap}
+.chk.on{background:var(--grn)}
+.ghost{background:none;color:var(--red);font-size:13px}
+.main{width:100%;background:linear-gradient(135deg,var(--p),var(--b));color:#fff;border-radius:14px;padding:14px;font-size:16px;font-weight:500;margin-top:6px}
+.main:disabled{opacity:.6}
+label{display:block;font-size:13px;color:var(--mute);margin:12px 0 4px}
+input,textarea,select{width:100%;font:inherit;padding:11px;border:1px solid var(--line);border-radius:12px;background:#fff;color:var(--ink)}
+textarea{min-height:90px}
+nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);display:flex;justify-content:center;gap:6px;padding:8px}
+nav button{flex:1;max-width:220px;background:none;padding:10px;border-radius:12px;color:var(--mute);font-size:13px}
+nav button.act{background:#ece8ff;color:var(--p);font-weight:600}
+.empty{text-align:center;color:var(--mute);padding:24px}
+.msg{font-size:13px;margin-top:10px;color:var(--mute)}
+details summary{cursor:pointer;list-style:none}
+.step{padding:9px 0;border-top:1px solid var(--line)}
+.pop{animation:pop .35s}@keyframes pop{50%{transform:scale(1.04)}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<nav>
+  <button data-v="dash" class="act">🏠 หน้าหลัก</button>
+  <button data-v="add">➕ เพิ่มงาน</button>
+  <button data-v="list">📋 รายการงาน</button>
+</nav>
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const iso = d => { const z = new Date(d.getTime() - d.getTimezoneOffset()*60000); return z.toISOString().slice(0,10); };
+const addDays = n => { const d = new Date(); d.setDate(d.getDate()+n); return iso(d); };
+const today = () => iso(new Date());
+const daysTo = s => Math.round((new Date(s) - new Date(today())) / 86400000);
+const fmt = s => new Date(s).toLocaleDateString("th-TH",{day:"numeric",month:"short"});
+
+const sample = () => [
+  {id:1,subject:"ชีววิทยา",desc:"รายงานระบบย่อยอาหาร",due:addDays(2),diff:"ปานกลาง",steps:[
+    {title:"ค้นคว้าข้อมูล (Research)",min:45,date:today(),done:false},
+    {title:"เขียนบทนำและเนื้อหา",min:60,date:addDays(1),done:false},
+    {title:"ตรวจทานและส่งงาน",min:20,date:addDays(2),done:false}]},
+  {id:2,subject:"คอมพิวเตอร์",desc:"Final Project",due:addDays(9),diff:"ยาก",steps:[
+    {title:"เลือกหัวข้อ",min:30,date:addDays(1),done:false},
+    {title:"ทำ Prototype",min:120,date:addDays(4),done:false},
+    {title:"ทดสอบ",min:45,date:addDays(6),done:false},
+    {title:"ทำ Presentation",min:60,date:addDays(8),done:false}]},
+  {id:3,subject:"คณิตศาสตร์",desc:"แบบฝึกหัดบทที่ 5",due:addDays(14),diff:"ง่าย",steps:[
+    {title:"ทำข้อ 1-10",min:40,date:addDays(10),done:false},
+    {title:"ทำข้อ 11-20 และส่งงาน",min:40,date:addDays(13),done:false}]}
+];
+let tasks; try { tasks = JSON.parse(localStorage.getItem("sm_tasks")); } catch(e){}
+if (!Array.isArray(tasks)) tasks = sample();
+const save = () => { try { localStorage.setItem("sm_tasks", JSON.stringify(tasks)); } catch(e){} };
+
+function prio(t){
+  const left = t.steps.filter(s=>!s.done);
+  if(!left.length) return "fin";
+  const dl = daysTo(t.due);
+  if(left.some(s=>s.date<=today()) || dl<=2) return "urgent";
+  if(dl<=7) return "soon";
+  return "later";
+}
+const label = {urgent:"🔴 ต้องทำวันนี้",soon:"🟡 ควรทำเร็ว ๆ นี้",later:"🟢 ยังไม่เร่ง",fin:"✅ เสร็จแล้ว"};
+const pct = () => { const a = tasks.flatMap(t=>t.steps); return a.length ? Math.round(a.filter(s=>s.done).length/a.length*100) : 0; };
+
+let view = "dash", busy = false, note = "";
+
+function dash(){
+  const h = new Date().getHours();
+  const g = h<12 ? "สวัสดีตอนเช้า ☀️" : h<17 ? "สวัสดีตอนบ่าย 🌤️" : "สวัสดีตอนเย็น 🌙";
+  const c = {urgent:0,soon:0,later:0};
+  tasks.forEach(t=>{const p=prio(t); if(c[p]!==undefined) c[p]++;});
+  const mission = [];
+  tasks.forEach(t=>t.steps.forEach((s,i)=>{ if(!s.done && s.date<=today()) mission.push({t,s,i}); }));
+  mission.sort((a,b)=>a.s.date.localeCompare(b.s.date));
+  const top = mission.slice(0,5);
+  return `<div class="hero"><h1>${g}</h1><p>งานทั้งหมด ${tasks.length} งาน · ความคืบหน้า ${pct()}%</p><div class="bar"><i style="width:${pct()}%"></i></div></div>
+  <div class="stats">
+    <div class="stat"><b style="color:var(--red)">${c.urgent}</b><span>🔴 Urgent</span></div>
+    <div class="stat"><b style="color:var(--yel)">${c.soon}</b><span>🟡 Upcoming</span></div>
+    <div class="stat"><b style="color:var(--grn)">${c.later}</b><span>🟢 Later</span></div></div>
+  <h2>🎯 Today's Mission</h2>
+  ${top.length ? top.map(m=>`<div class="card row"><div class="grow"><div><b>${esc(m.t.subject)}</b></div><div>${esc(m.s.title)}</div><div class="sub">⏱ ${m.s.min} นาที${m.s.date<today()?" · เลยกำหนดแล้ว":""}</div></div><button class="chk" data-tog="${m.t.id}:${m.i}">เสร็จแล้ว ✅</button></div>`).join("")
+    : `<div class="card empty">ไม่มีภารกิจค้างสำหรับวันนี้ 🎉<br>กด "เพิ่มงาน" เพื่อให้ AI วางแผนงานใหม่</div>`}`;
+}
+
+function add(){
+  return `<h2>➕ เพิ่มงานใหม่</h2><div class="card">
+  <label>ชื่อวิชา</label><input id="f_sub" placeholder="เช่น ชีววิทยา">
+  <label>รายละเอียดงาน / โจทย์</label><textarea id="f_desc" placeholder="เช่น ทำรายงานเรื่องระบบย่อยอาหาร อย่างน้อย 5 หน้า"></textarea>
+  <label>วันส่ง</label><input id="f_due" type="date" min="${today()}" value="${addDays(7)}">
+  <label>ความยาก</label><select id="f_diff"><option>ง่าย</option><option selected>ปานกลาง</option><option>ยาก</option></select>
+  <button class="main" id="go" ${busy?"disabled":""}>${busy?"AI กำลังวิเคราะห์...":"✨ ให้ AI วิเคราะห์"}</button>
+  <div class="msg">${esc(note)}</div></div>`;
+}
+
+function list(){
+  if(!tasks.length) return `<h2>📋 รายการงาน</h2><div class="card empty">ยังไม่มีงาน กดแท็บ "เพิ่มงาน" ได้เลย</div>`;
+  return `<h2>📋 รายการงาน</h2>` + tasks.map(t=>{
+    const p = prio(t), d = t.steps.filter(s=>s.done).length;
+    return `<details class="card"><summary class="row"><div class="grow"><b>${esc(t.subject)}</b><div class="sub">${esc(t.desc)} · ส่ง ${fmt(t.due)} · ${d}/${t.steps.length} ขั้น</div></div><span class="tag ${p}">${label[p]}</span></summary>
+    ${t.steps.map((s,i)=>`<div class="step row ${s.done?"done":""}"><div class="grow"><div class="t">${esc(s.title)}</div><div class="sub">📅 ${fmt(s.date)} · ⏱ ${s.min} นาที</div></div><button class="chk ${s.done?"on":""}" data-tog="${t.id}:${i}">${s.done?"เสร็จแล้ว ✅":"☐ ทำเสร็จ"}</button></div>`).join("")}
+    <div style="text-align:right;margin-top:8px"><button class="ghost" data-del="${t.id}">🗑 ลบงาน</button></div></details>`;
+  }).join("");
+}
+
+function render(){
+  const keep = ["f_sub","f_desc","f_due","f_diff"].map(id=>$("#"+id)?.value);
+  $("#app").innerHTML = view==="dash" ? dash() : view==="add" ? add() : list();
+  if(view==="add") ["f_sub","f_desc","f_due","f_diff"].forEach((id,i)=>{ if(keep[i]!==undefined) $("#"+id).value = keep[i]; });
+  document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("act", b.dataset.v===view));
+}
+
+// ตัววางแผนสำรอง (ใช้เมื่อไม่มี API Key หรือ API ใช้ไม่ได้)
+function localPlan(diff, due){
+  const mult = {"ง่าย":.7,"ปานกลาง":1,"ยาก":1.5}[diff] || 1;
+  const names = [["เลือกหัวข้อ / ทำความเข้าใจโจทย์",30],["ค้นคว้าข้อมูล (Research)",60],["วางโครงเรื่อง",30],["ลงมือทำ / เขียนเนื้อหา",90],["ตรวจทานและแก้ไข",40],["ส่งงาน",15]];
+  const span = Math.max(daysTo(due),0);
+  return names.map(([title,m],i)=>({title,min:Math.round(m*mult/5)*5,date:addDays(Math.round(span*i/(names.length-1))),done:false}));
+}
+
+async function analyze(){
+  const subject=$("#f_sub").value.trim(), desc=$("#f_desc").value.trim(), due=$("#f_due").value, diff=$("#f_diff").value;
+  if(!subject||!desc||!due){ note="กรุณากรอกวิชา โจทย์ และวันส่งให้ครบ"; return render(); }
+  busy=true; note=""; render();
+  let steps, via = "AI";
+  try{
+    const r = await fetch("/api/analyze",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({subject,desc,due,diff,today:today()})});
+    const j = await r.json();
+    if(!r.ok) throw new Error(j.error);
+    steps = j.steps.map(s=>({title:String(s.title),min:Number(s.minutes)||30,date:(s.date>due?due:s.date<today()?today():s.date),done:false}));
+  }catch(e){ steps = localPlan(diff,due); via = "ตัววางแผนสำรอง (ยังไม่ได้เชื่อม AI)"; }
+  steps.sort((a,b)=>a.date.localeCompare(b.date));
+  tasks.unshift({id:Date.now(),subject,desc,due,diff,steps});
+  save(); busy=false; view="list";
+  render();
+  const first = document.querySelector("details"); if(first) first.open = true;
+  console.log("วิเคราะห์ด้วย:", via);
+}
+
+document.addEventListener("click", e=>{
+  const nav = e.target.closest("nav button"); if(nav){ view=nav.dataset.v; note=""; return render(); }
+  const tog = e.target.closest("[data-tog]");
+  if(tog){ const [id,i]=tog.dataset.tog.split(":"); const t=tasks.find(x=>x.id==id); if(t){ t.steps[+i].done=!t.steps[+i].done; save();
+    const open=[...document.querySelectorAll("details")].map(d=>d.open); render(); document.querySelectorAll("details").forEach((d,k)=>d.open=open[k]);} return; }
+  const del = e.target.closest("[data-del]");
+  if(del){ if(confirm("ลบงานนี้ใช่ไหม?")){ tasks=tasks.filter(x=>x.id!=del.dataset.del); save(); render(); } return; }
+  if(e.target.id==="go") analyze();
+});
+render();
+</script>
+</body>
+</html>
